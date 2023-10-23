@@ -1,0 +1,208 @@
+//Domeniul: COMPANIE
+
+#include<iostream>
+
+using namespace std;
+
+class Angajat {
+public:
+	string nume;
+	int* varsta;
+	float salariu;
+	string departament;
+	static int nrTotalAngajati;
+	const string companie = "Companie";
+
+	Angajat() {
+		this->nume = "NoName";
+		this->varsta = NULL;
+		this->salariu = 0;
+		this->departament = "FaraDepartament";
+	}
+
+	Angajat(string nume, string departament) {
+		this->nume = nume;
+		this->varsta = NULL;
+		this->salariu = 0;
+		this->departament = departament;
+	}
+
+	Angajat(string nume, int* varsta, float salariu, string departament, int nrTotalAngajati, string companie) {
+		this->nume = nume;
+		this->varsta = new int[nrTotalAngajati];
+		for (int i = 0; i < nrTotalAngajati; i++)
+		{
+			this->varsta[i] = varsta[i];
+		}
+		this->salariu = salariu;
+		this->departament = departament;
+	}
+	~Angajat() {
+		if (this->varsta != NULL)
+			delete[]this->varsta;
+	}
+
+	float getSalariulMediu() {
+		if (this->nrTotalAngajati == 0)
+			return 0;
+		return this->salariu / this->nrTotalAngajati;
+	}
+
+	void afisareAngajat() {
+		cout << "Angajatul " << nume << " are varsta ";
+			if(varsta != NULL) {
+				cout << "Varsta: " << *varsta << endl;
+			}
+			else {
+				cout << "Varsta: Informatie lipsa" << endl;
+			}
+			cout<< "si salariul " << salariu <<". Face parte din departamentul " << departament << endl;
+	}
+	static void setNrTotalAngajati() {
+		Angajat::nrTotalAngajati = nrTotalAngajati;
+	}
+};
+int Angajat::nrTotalAngajati = 230;
+
+class Departament {
+public:
+	string nume;
+	int nrAngajati;
+	int* varsteAngajati;
+	const string sediuCentral;
+	static string manager;
+
+	Departament() {
+		this->nume = "NoName";
+		this->nrAngajati = 0;
+	}
+	Departament(string nume) {
+		this->nume = nume;
+		this->nrAngajati = 0;
+	}
+	Departament(string nume, int nrAngajati, int* varsteAngajati, string sediuCentral) {
+		this->nume = nume;
+		this->nrAngajati = nrAngajati;
+		this->varsteAngajati = new int[nrAngajati];
+		for (int i = 0; i < this->nrAngajati; i++)
+			this->varsteAngajati[i] = varsteAngajati[i];
+	}
+
+	~Departament() {
+		if (this->varsteAngajati != NULL) 
+			delete[]this->varsteAngajati;
+		}
+
+	// Funcție pentru a calcula salariul mediu al angajaților
+	static float calculeazaSalariulMediu(float* salarii, int nrDeAngajati) {
+		float sumaSalarii = 0;
+		for (int i = 0; i < nrDeAngajati; i++) {
+			sumaSalarii += salarii[i];
+		}
+		return sumaSalarii / nrDeAngajati;
+	}
+
+	void afisareDepartament() {
+		cout << "Departamentul " << nume << " are " << nrAngajati << " angajati, cu varste: ";
+		if (nrAngajati == 0)
+			cout << "-";
+		else
+			for (int i = 0; i < nrAngajati; i++)
+				cout << varsteAngajati[i] << " ";
+			cout<< ". Are sediul central  " << sediuCentral << " si managerul " << manager << endl;
+	}
+
+	static void setManager(string manager) {
+		Departament::manager = manager;
+	}
+};
+
+string Departament::manager = "Manager";
+
+class Produs {
+private:
+	string nume;
+	float pret;
+	int stocDisponibil;
+	static int nrTotalProduse;
+	const float taxaTVA = 0.19;
+	int nrMarciIstoric;
+	int* istoricMarci;
+
+public:
+	Produs() {
+		this->nume = "NoName";
+		this->pret = 0;
+		this->stocDisponibil = NULL;
+		this->istoricMarci = NULL;
+		this->nrMarciIstoric = 0;
+	}
+
+	Produs(string nume, int stocDisponibil) {
+		this->nume = nume;
+		this->pret = 0;
+		this->stocDisponibil = stocDisponibil;
+		this->istoricMarci = NULL;
+		this->nrMarciIstoric = 0;
+	}
+
+	Produs(string nume, float pret, int stocDisponibil, float taxaTVA, int nrMarciDinIstoric, int* istoricMarci) {
+		this->nume = nume;
+		this->pret = pret;
+		this->stocDisponibil = stocDisponibil;
+		this->nrMarciIstoric = nrMarciDinIstoric;
+		this->istoricMarci = new int[nrMarciDinIstoric];
+		for (int i = 0; i < nrMarciDinIstoric; i++) {
+			this->istoricMarci[i] = istoricMarci[i];
+		}
+		
+	}
+
+	~Produs() {
+		if (this->istoricMarci != NULL)
+			delete[]this->istoricMarci;
+	}
+
+	float calculeazaValoareStoc() {
+		int x = pret * stocDisponibil;
+		return x;
+	}
+
+	void afisareProdus() {
+		cout << "Produsul cu numele " << nume << " si pretul " << pret
+			<< ", este disponibil de " << stocDisponibil << " ori. Numarul total de produse este de "
+			<< nrTotalProduse << " iar taxa TVA este de " << taxaTVA;
+			if (istoricMarci != NULL) {
+				for (int i = 0; i < this->nrMarciIstoric; i++)
+					cout << this->istoricMarci[i];
+			}
+			else {
+				cout << "Nu exista un istoric al marcilor pentru produsul " << this->nume << endl;
+			} 
+			cout<< endl;
+			 
+	}
+
+
+	static void setNrTotalProduse(int nrTotalProduse) {
+		Produs::nrTotalProduse = nrTotalProduse;
+	}
+};
+
+int Produs::nrTotalProduse = 2000;
+
+void main() {
+	Angajat angajat;
+	angajat.afisareAngajat();
+	int varste[] = { 30, 35, 40 };
+	Angajat angajat1("Ion", varste, 5000.0, "IT", 200, "Companie");
+    angajat1.afisareAngajat();
+	
+	Departament departament1("HR", 3, varste, "Centrala");
+	departament1.afisareDepartament();
+
+	int istoricMarci[] = { 1111, 1112, 1115 };
+	Produs produs1("Laptop", 1500.0, 10, 0.19,3, istoricMarci);
+	produs1.afisareProdus();
+
+}
