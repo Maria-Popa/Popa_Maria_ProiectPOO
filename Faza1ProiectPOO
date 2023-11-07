@@ -82,7 +82,7 @@ public:
 		return true;
 	}
 
-	Angajat(string nume, int* varsta, float salariu, string departament, int nrTotalAngajati, string companie): companie(companie) {
+	Angajat(string nume, int* varsta, float salariu, string departament, int nrTotalAngajati, string companie) : companie(companie) {
 		this->nume = nume;
 		this->varsta = new int[nrTotalAngajati];
 		for (int i = 0; i < nrTotalAngajati; i++)
@@ -162,6 +162,37 @@ public:
 	friend int getSalariuPeZi(Angajat& a) {
 		return a.salariu / 30;
 	}
+	friend istream& operator>>(istream& in, Angajat& a) {
+		cout << "Introduceti numele angajatului: ";
+		in >> a.nume;
+		cout << "Introduceti numele departamentului: ";
+		in >> a.departament;
+		cout << "Introduceti salariul angajatului: ";
+		in >> a.salariu;
+		cout << "Introduceti numarul angajatilor: ";
+		int nrAng;
+		in >> nrAng;
+		a.setNrTotalAngajati(nrAng);
+		delete[]a.varsta;
+		a.varsta = new int[nrAng];
+		for (int i = 0; i < nrAng; i++) {
+			cout << "Introduceti varsta angajatului " << i + 1 << ": ";
+			in >> a.varsta[i];
+		}
+		return in;
+	}
+	friend ostream& operator<<(ostream& out, Angajat& a) {
+		out << endl;
+		out << "Angajatul " << a.getNume() << " lucreaza in compania " << a.getCompanie() << ", in departamentul " << a.getDepartament() << ", are un salariu de " << a.getSalariu()
+			<< "de lei";
+		out << endl << "Acesta are " << a.getNrTotalAngajati() - 1 << " de colegi in acest departament, cu varstele :";
+		for (int i = 0; i < a.getNrTotalAngajati(); i++)
+			out << endl << a.varsta[i];
+		out << endl;
+		return out;
+
+	}
+
 };
 int Angajat::nrTotalAngajati = 230;
 
@@ -218,9 +249,9 @@ public:
 		if (this->nume != d.nume || this->nrAngajati != d.nrAngajati || this->sediuCentral != d.sediuCentral)
 			return true;
 		else {
-				for (int i = 0; i < this->nrAngajati; i++)
-					if (this->varsteAngajati[i] != d.varsteAngajati[i])
-						return true;
+			for (int i = 0; i < this->nrAngajati; i++)
+				if (this->varsteAngajati[i] != d.varsteAngajati[i])
+					return true;
 		}
 		return false;
 	}
@@ -229,14 +260,12 @@ public:
 		return this->varsteAngajati[index];
 	}
 
-	int* operator()(int n) {
-		int* v = new int[n];
+	int operator()(int n) {
+		int suma = 0;
 		if (n > 0 && n < this->nrAngajati)
 			for (int i = 0; i < n; i++)
-				v[i] = this->varsteAngajati[i];
-		if (v != NULL)
-			return v;
-		delete[]v;
+				suma += this->varsteAngajati[i];
+		return suma;
 	}
 
 	~Departament() {
@@ -271,6 +300,10 @@ public:
 		return nume;
 	}
 
+	string getSediuCentral() const {
+		return this->sediuCentral;
+	}
+
 	void setNrAngajati(int nr) {
 		nrAngajati = nr;
 	}
@@ -296,6 +329,33 @@ public:
 
 	static string getManager() {
 		return manager;
+	}
+	friend istream& operator>>(istream& in, Departament& d) {
+		cout << "Introduceti numele departamentului: ";
+		in >> d.nume;
+		cout << "Introduceti numarul de angajati: ";
+		in >> d.nrAngajati;
+		cout << "Introduceti numele managerului: ";
+		string manager;
+		in >> manager;
+		d.setManager(manager);
+		delete[]d.varsteAngajati;
+		d.varsteAngajati = new int[d.getNrAngajati()];
+		for (int i = 0; i < d.getNrAngajati(); i++) {
+			cout << endl << "Introduceti varsta angajatului " << i + 1 << ": ";
+			in >> d.varsteAngajati[i];
+		}
+		return in;
+	}
+	friend ostream& operator<<(ostream& out, Departament& d) {
+		out << endl;
+		out << "Departamentul " << d.getNume() << " are sediul central in " << d.getSediuCentral() << ", are un numar de " << d.getNrAngajati() << " de angajati, cu varstele: " << endl;
+		for (int i = 0; i < d.getNrAngajati(); i++) {
+			out << d.varsteAngajati[i] << endl;
+		}
+		out << endl;
+		return out;
+
 	}
 };
 
@@ -438,6 +498,10 @@ public:
 		return nrMarciIstoric;
 	}
 
+	float getTaxaTVA() const {
+		return this->taxaTVA;
+	}
+
 	void setIstoricMarci(int* istoric, int nrMarci) {
 		istoricMarci = new int[nrMarci];
 		for (int i = 0; i < nrMarci; i++) {
@@ -453,6 +517,34 @@ public:
 		int x = p.pret * p.stocDisponibil;
 		return x;
 	}
+	friend istream& operator>>(istream& in, Produs& p) {
+		cout << "Introduceti numele produsului: ";
+		in >> p.nume;
+		cout << "Introduceti pretul produsului: ";
+		in >> p.pret;
+		cout << "Introduceti stocul disponibil al produsului curent: ";
+		in >> p.stocDisponibil;
+		cout << "Cate marci din istoricul produsului se cunosc? " << endl;
+		in >> p.nrMarciIstoric;
+		delete[]p.istoricMarci;
+		p.istoricMarci = new int[p.getNrMarciIstoric()];
+		for (int i = 0; i < p.getNrMarciIstoric(); i++) {
+			cout << endl << i + 1 << ": ";
+			in >> p.istoricMarci[i];
+		}
+		return in;
+	}
+	friend ostream& operator<<(ostream& out, Produs& p) {
+		out << endl;
+		out << "Produsul " << p.getNume() << " se afla in baza de date alaturi de " << p.getNrTotalProduse() << " produse, in stoc se afla in numar de " << p.getStocDisponibil();
+		out << endl << "Pretul curent al acestui produs este " << p.getPret() << ", la care se aplica un tva de " << p.getTaxaTVA();
+		out << endl << "Din trecutul produsului se cunosc " << p.getNrMarciIstoric() << " de marci, acestea fiind: ";
+		for (int i = 0; i < p.getNrMarciIstoric(); i++)
+			out << endl << i + 1 << ": " << p.getIstoricMarci()[i];
+		out << endl;
+		return out;
+
+	}
 };
 
 int Produs::nrTotalProduse = 2000;
@@ -460,23 +552,45 @@ int Produs::nrTotalProduse = 2000;
 void main() {
 	Angajat angajat;
 	angajat.afisareAngajat();
+
 	int varste[] = { 30, 35, 40 };
 	Angajat angajat1("Ion", varste, 5000.0, "IT", 200, "Companie");
 	angajat1.afisareAngajat();
 	Angajat angajat2 = angajat1;
 	Angajat angajat3(angajat1);
-	cout << getSalariuPeZi(angajat1)<<endl;
+	cout << getSalariuPeZi(angajat1) << endl;
 	if (angajat2 == angajat1)
-		cout << "Asa e";
-	else
-		cout << "Nu e";
+		cout << endl << "Au fost introdusi doi agenti identici." << endl;
+	Angajat a1;
+	cin >> a1;
+	Angajat a2 = a1 + angajat1;
+	cout << "A avut loc o modificare cu angajatul " << a2.getNume() << endl;
+	cout << a2;
+	cout << endl << "Dintre angajati, s-a observat ca un tanar talent depaseste asteptarile tuturor, acesta are varsta de " << a2[1] << "de ani." << endl;
 
 	Departament departament1("HR", 3, varste, "Centrala");
 	departament1.afisareDepartament();
+	Departament d1;
+	cout << "Va rugam sa introduceti un departament nou!" << endl;
+	cin >> d1;
+	if (d1 != departament1)
+		cout << endl << "Va multumim.";
+	else
+		cout << endl << "Si v-am rugat ceva...";
+	cout << "Din departamentul " << d1.getNume() << " se remarca unul dintre angajati, acesta are varsta de " << d1[2] << " de ani, in timp ce media departamentului este de "
+		<< (d1(d1.getNrAngajati() - 1) / d1.getNrAngajati()) << " de ani";
+
 
 	int istoricMarci[] = { 1111, 1112, 1115 };
 	Produs produs1("Laptop", 1500.0, 10, 0.19, 3, istoricMarci);
 	produs1.afisareProdus();
-	cout << calculeazaValoareStoc(produs1)<<endl;
-
+	cout << calculeazaValoareStoc(produs1) << endl;
+	Produs p1;
+	cin >> p1;
+	Produs p2 = p1;
+	if (produs1 > p1)
+		cout << endl << "Trebuie sa introducem si produse cu cantitati si preturi mai mari decat cele deja existente.";
+	if (produs1 < p1)
+		cout << endl << "Trebuie sa introducem si produse cu cantitati si preturi mai mici decat cele deja existente.";
+	cout << endl << "Dintre toate aceste preturi, cele mai mari vanzari au fost inregistrate cand costul a fost " << p1[0];
 }
