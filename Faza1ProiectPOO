@@ -35,7 +35,7 @@ public:
 		this->nrTotalAngajati = a.nrTotalAngajati;
 		if (this->varsta != NULL)
 			delete[]this->varsta;
-		this->varsta = new int[nrTotalAngajati];
+		this->varsta = new int[a.nrTotalAngajati];
 		for (int i = 0; i < this->nrTotalAngajati; i++)
 			this->varsta[i] = a.varsta[i];
 	}
@@ -185,7 +185,7 @@ public:
 		out << endl;
 		out << "Angajatul " << a.getNume() << " lucreaza in compania " << a.getCompanie() << ", in departamentul " << a.getDepartament() << ", are un salariu de " << a.getSalariu()
 			<< "de lei";
-		out << endl << "Acesta are " << a.getNrTotalAngajati() - 1 << " de colegi in acest departament, cu varstele :";
+		out << endl << "Acesta are " << a.getNrTotalAngajati() << " de colegi in acest departament, cu varstele :";
 		for (int i = 0; i < a.getNrTotalAngajati(); i++)
 			out << endl << a.varsta[i];
 		out << endl;
@@ -195,6 +195,8 @@ public:
 
 };
 int Angajat::nrTotalAngajati = 230;
+
+
 
 class Departament {
 private:
@@ -339,7 +341,6 @@ public:
 		string manager;
 		in >> manager;
 		d.setManager(manager);
-		delete[]d.varsteAngajati;
 		d.varsteAngajati = new int[d.getNrAngajati()];
 		for (int i = 0; i < d.getNrAngajati(); i++) {
 			cout << endl << "Introduceti varsta angajatului " << i + 1 << ": ";
@@ -360,6 +361,7 @@ public:
 };
 
 string Departament::manager = "Manager";
+
 
 class Produs {
 private:
@@ -549,7 +551,10 @@ public:
 
 int Produs::nrTotalProduse = 2000;
 
+
+
 void main() {
+
 	Angajat angajat;
 	angajat.afisareAngajat();
 
@@ -593,4 +598,93 @@ void main() {
 	if (produs1 < p1)
 		cout << endl << "Trebuie sa introducem si produse cu cantitati si preturi mai mici decat cele deja existente.";
 	cout << endl << "Dintre toate aceste preturi, cele mai mari vanzari au fost inregistrate cand costul a fost " << p1[0];
-}
+
+	Angajat angajat12;
+	cin >> angajat12;
+	cout << angajat12;
+	cout << endl;
+
+	Departament departament12;
+	cin >> departament12;
+	cout << departament12;
+	cout << endl;
+
+	Produs produs12;
+	cin >> produs12;
+	cout << produs12;
+	cout << endl;
+
+	int nrAngajati = 0;
+	cout << "Numarul de angajati este :";
+	cin >> nrAngajati;
+	Angajat* vangajat = new Angajat[nrAngajati];
+	for (int i = 0; i < nrAngajati; i++) {
+		cout << "Angajatul cu numarul: " << i + 1 << " : ";
+		cin >> vangajat[i];
+	}
+	for (int i = 0; i < nrAngajati; i++) {
+		cout << "Angajatul cu numarul: " << i + 1 << " : ";
+		cout << vangajat[i];
+		cout << endl;
+	}
+	cout << endl;
+
+
+	int nrDepartamente = 0;
+	cout << "Numarul departamentelor este :\n";
+	cin >> nrDepartamente;
+	Departament* vdepartament = new Departament[nrDepartamente];
+	for (int i = 0; i < nrDepartamente; i++) {
+		cout << "Departamentul cu numarul " << i + 1 << " : ";
+		cin >> vdepartament[i];
+	}
+	for (int i = 0; i < nrDepartamente; i++) {
+		cout << "Departamentul cu numarul " << i + 1 << " : ";
+		cout << vdepartament[i];
+		cout << endl;
+	}
+	cout << endl;
+
+	int nrProduse = 0;
+	cout << "Numarul de produse este :";
+	cin >> nrProduse;
+	Produs* vprodus = new Produs[nrProduse];
+	for (int i = 0; i < nrProduse; i++) {
+		cout << "Produsul cu numarul: " << i + 1 << " : ";
+		cin >> vprodus[i];
+	}
+	for (int i = 0; i < nrProduse; i++) {
+		cout << "Produsul cu numarul: " << i + 1 << " : ";
+		cout << vprodus[i];
+		cout << endl;
+	}
+	cout << endl;
+
+	int nrLinii = 0;
+	int nrColoane = 0;
+	cout << "Numarul de linii din matrice: ";
+	cin >> nrLinii;
+	cout << "Numarul de coloane din matrice: ";
+	cin >> nrColoane;
+	Produs** matriceProdus = new Produs * [nrLinii];
+	for (int i = 0; i < nrLinii; i++) {
+		matriceProdus[i] = new Produs[nrColoane];
+
+	}
+	cout << "Matrice:" << endl;
+	for (int i = 0; i < nrLinii; i++) {
+		for (int j = 0; j < nrColoane; j++) {
+			cout << "Linia: " << (i + 1) << " si coloana:" << (j + 1) << endl;
+			cin >> matriceProdus[i][j];
+		}
+	}
+	cout << "Afisare matrice: " << endl;
+	for (int i = 0; i < nrLinii; i++) {
+		for (int j = 0; j < nrColoane; j++) {
+			cout << "Linia: " << (i + 1) << " si coloana: " << (j + 1) << endl;
+			cout << matriceProdus[i][j];
+		}
+	}
+	cout << endl;
+
+};
