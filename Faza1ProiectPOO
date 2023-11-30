@@ -551,7 +551,134 @@ public:
 
 int Produs::nrTotalProduse = 2000;
 
+class Magazin {
+private:
+	string nume;
+	int nrTotalProduse;
+	Produs* produse;
+	int nrAngajati;
+public:
+	Magazin() {
+		this->nume = "Necunoscut";
+		this->nrTotalProduse = 0;
+		this->produse = NULL;
+		this->nrAngajati = 0;
+	}
 
+	Magazin(string nume, int nrTotalProduse, Produs* produse, int nrAngajati) {
+		this->nume = nume;
+		this->nrTotalProduse = nrTotalProduse;
+		this->nrAngajati = nrAngajati;
+		this->produse = new Produs[nrTotalProduse];
+		for (int i = 0; i < nrTotalProduse; i++) {
+			this->produse[i] = produse[i];
+		}
+	}
+
+	void setNume(string nume) {
+		this->nume = nume;
+	}
+
+	string getNume() const {
+		return nume;
+	}
+
+	void setNrTotalProduse(int nrTotalProduse) {
+		this->nrTotalProduse = nrTotalProduse;
+	}
+
+	int getNrTotalProduse() const {
+		return nrTotalProduse;
+	}
+
+	void nrAngajati(int nrAngajati) {
+		nrAngajati = nrAngajati;
+	}
+
+	int nrAngajati() const {
+		return nrAngajati;
+	}
+
+	void setProduse(Produs* produs, int nrProduse) {
+		produse = new Produs[nrProduse];
+		for (int i = 0; i < nrProduse; i++) {
+			produse[i] = produs[i];
+		}
+	}
+
+	Produs* getProduse() const {
+		return produse;
+	}
+
+	Magazin(Magazin& m) {
+		this->nume = m.nume;
+		this->nrTotalProduse = m.nrTotalProduse;
+		this->nrAngajati = m.nrAngajati;
+		this->produse = new Produs[nrTotalProduse];
+		for (int i = 0; i < nrTotalProduse; ++i) {
+			produse[i] = m.produse[i];
+		}
+	}
+
+	const Magazin& operator=(const Magazin& m) {
+		if (this != &m) {
+			if (this->produse != NULL)
+				delete[]this->produse;
+			this->nume = m.nume;
+			this->nrTotalProduse = m.nrTotalProduse;
+			this->nrAngajati = m.nrAngajati;
+			this->produse = new Produs[nrTotalProduse];
+			for (int i = 0; i < nrTotalProduse; ++i) {
+				this->produse[i] = m.produse[i];
+			}
+		}
+		return *this;
+	}
+
+	~Magazin() {
+		if (this->produse != NULL)
+			delete[]this->produse;
+	}
+
+	friend istream& operator>>(istream& in, Magazin& magazin) {
+		cout << "Nume:";
+		in >> magazin.nume;
+		cout << "\n Numar total produse:";
+		in >> magazin.nrTotalProduse;
+		cout << " \n Numar angajati:";
+		in >> magazin.nrAngajati;
+		if (magazin.produse != NULL)
+		{
+			delete[]magazin.produse;
+		}
+		/*magazin.produse = new Produs[magazin.nrTotalProduse];
+		for (Produs* i = 0; i < magazin.nrTotalProduse; i++)
+		{
+			cout << " Produsele " << i + 1 << " : ";
+			in >> magazin.nrTotalProduse[i];
+
+		}*/
+
+		magazin.setProduse(new Produs[magazin.getNrTotalProduse()], magazin.getNrTotalProduse());
+		for (int i = 0; i < magazin.getNrTotalProduse(); i++) {
+			cout << "Produsul " << i + 1 << " : ";
+			in >> magazin.getProduse()[i];
+		}
+
+		return in;
+	}
+
+	friend ostream& operator<<(ostream& out, const Magazin& magazin) {
+		out << "Magazinul " << magazin.getNume() << " are " << magazin.nrAngajati << " angajati si " << magazin.nrTotalProduse << "produse" << ". Produsele: ";
+		if (magazin.nrTotalProduse == 0)
+			out << "-";
+		else
+			for (int i = 0; i < magazin.nrTotalProduse; i++)
+				out << magazin.produse[i] << " ";
+		out << endl;
+		return out;
+	}
+};
 
 void main() {
 
@@ -598,21 +725,6 @@ void main() {
 	if (produs1 < p1)
 		cout << endl << "Trebuie sa introducem si produse cu cantitati si preturi mai mici decat cele deja existente.";
 	cout << endl << "Dintre toate aceste preturi, cele mai mari vanzari au fost inregistrate cand costul a fost " << p1[0];
-
-	Angajat angajat12;
-	cin >> angajat12;
-	cout << angajat12;
-	cout << endl;
-
-	Departament departament12;
-	cin >> departament12;
-	cout << departament12;
-	cout << endl;
-
-	Produs produs12;
-	cin >> produs12;
-	cout << produs12;
-	cout << endl;
 
 	int nrAngajati = 0;
 	cout << "Numarul de angajati este :";
@@ -685,6 +797,26 @@ void main() {
 			cout << matriceProdus[i][j];
 		}
 	}
+
 	cout << endl;
 
+	Magazin magazin1;
+	cin >> magazin1;
+	cout << magazin1;
+
+	Magazin magazin2;
+	cout << "Introduceti informatii despre magazin:\n";
+	cin >> magazin2;
+	cout << "Magazin:\n" << magazin2 << endl;
+	cout << "Numele magazinului: " << magazin2.getNume() << endl;
+	cout << "Numar total produse magazin: " << magazin2.getNrTotalProduse() << endl;
+	magazin2.setNume("Magazin nou");
+	cout << "Magazin dupa actualizare:\n" << magazin2 << endl;
+	Magazin magazin3;
+	magazin3 = magazin2;
+	cout << "Magazin atribuit:\n" << magazin3 << endl;
+	Magazin magazinNou(magazin2);
+	cout << "Magazin copie:\n" << magazinNou << endl;
+
 };
+
