@@ -1,7 +1,7 @@
 //Domeniul: COMPANIE
 
 #include<iostream>
-
+#include<fstream>
 using namespace std;
 
 class Angajat {
@@ -356,7 +356,52 @@ public:
 		}
 		out << endl;
 		return out;
+	}
 
+	friend ifstream& operator>>(ifstream& in, Departament& d) {
+		in >> d.nume;
+		in >> d.nrAngajati;
+		if (d.varsteAngajati != NULL)
+			delete[]d.varsteAngajati;
+		d.varsteAngajati = new int[d.nrAngajati];
+		for (int i = 0; i < d.nrAngajati; i++)
+			in >> d.varsteAngajati[i];
+		return in;
+	}
+
+	friend ofstream& operator<<(ofstream& out, Departament& d) {
+		out << d.nume << endl;
+		out << d.nrAngajati << endl;
+		for (int i = 0; i < d.nrAngajati; i++)
+			out << d.varsteAngajati[i] << endl;
+		return out;
+	}
+
+	void scriereInFisierBinar(string numeFisier) {
+		ofstream f(numeFisier, ios::binary | ios::out);
+		int lung = nume.length() + 1;
+		f.write((char*)&lung, sizeof(int));
+		f.write((char*)nume.c_str(), lung);
+		f.write((char*)&nrAngajati, sizeof(int));
+		for (int i = 0; i < nrAngajati; i++)
+			f.write((char*)&varsteAngajati[i], sizeof(int));
+		f.close();
+	}
+	void citireInFisierBinar(string numeFisier) {
+		ifstream f(numeFisier, ios::binary | ios::in);
+		int lung;
+		f.read((char*)&lung, sizeof(int));
+		char* temp = new char[lung];
+		f.read((char*)temp, lung);
+		nume = temp;
+		f.read((char*)&nrAngajati, sizeof(int));
+		if (varsteAngajati != NULL)
+			delete[]varsteAngajati;
+		varsteAngajati = new int[nrAngajati];
+		for (int i = 0; i < nrAngajati; i++)
+			f.read((char*)&varsteAngajati[i], sizeof(int));
+		delete[]temp;
+		f.close();
 	}
 };
 
@@ -545,12 +590,63 @@ public:
 			out << endl << i + 1 << ": " << p.getIstoricMarci()[i];
 		out << endl;
 		return out;
-
+	}
+	friend ifstream& operator>>(ifstream& in, Produs& p) {
+		in >> p.nume;
+		in >> p.pret;
+		in >> p.stocDisponibil;
+		in >> p.nrMarciIstoric;
+		if (p.istoricMarci != NULL)
+			delete[]p.istoricMarci;
+		p.istoricMarci = new int[p.nrMarciIstoric];
+		for (int i = 0; i < p.getNrMarciIstoric(); i++) {
+			in >> p.istoricMarci[i];
+		}
+		return in;
+	}
+	friend ofstream& operator<<(ofstream& out, Produs& p) {
+		out << p.nume << endl;
+		out << p.pret << endl;
+		out << p.stocDisponibil << endl;
+		out << p.nrMarciIstoric << endl;
+		for (int i = 0; i < p.nrMarciIstoric; i++)
+			out << p.istoricMarci[i] << endl;
+		return out;
+	}
+	void sciereInFisierBinar(string numeFisier) {
+		ofstream f(numeFisier, ios::binary | ios::out);
+		int lung = nume.length() + 1;
+		f.write((char*)&lung, sizeof(int));
+		f.write((char*)nume.c_str(), lung);
+		f.write((char*)&pret, sizeof(float));
+		f.write((char*)&stocDisponibil, sizeof(int));
+		f.write((char*)&nrMarciIstoric, sizeof(int));
+		for (int i = 0; i < nrMarciIstoric; i++)
+			f.write((char*)&istoricMarci[i], sizeof(int));
+		f.close();
+	}
+	void citesteDinFisierBinar(string numeFisier) {
+		ifstream f(numeFisier, ios::binary | ios::in);
+		int lung;
+		f.read((char*)&lung, sizeof(int));
+		char* temp = new char[lung];
+		f.read((char*)temp, lung);
+		nume = temp;
+		f.read((char*)&pret, sizeof(float));
+		f.read((char*)&stocDisponibil, sizeof(int));
+		f.read((char*)&nrMarciIstoric, sizeof(int));
+		if (istoricMarci != NULL)
+			delete[]istoricMarci;
+		istoricMarci = new int[nrMarciIstoric];
+		for (int i = 0; i < nrMarciIstoric; i++)
+			f.read((char*)&istoricMarci[i], sizeof(int));
+		delete[]temp;
+		f.close();
 	}
 };
 
 int Produs::nrTotalProduse = 2000;
-
+/*
 class Magazin {
 private:
 	string nume;
@@ -651,13 +747,13 @@ public:
 		{
 			delete[]magazin.produse;
 		}
-		/*magazin.produse = new Produs[magazin.nrTotalProduse];
-		for (Produs* i = 0; i < magazin.nrTotalProduse; i++)
-		{
-			cout << " Produsele " << i + 1 << " : ";
-			in >> magazin.nrTotalProduse[i];
+		//magazin.produse = new Produs[magazin.nrTotalProduse];
+		//for (Produs* i = 0; i < magazin.nrTotalProduse; i++)
+		//{
+		//	cout << " Produsele " << i + 1 << " : ";
+		//	in >> magazin.nrTotalProduse[i];
 
-		}*/
+		//}
 
 		magazin.setProduse(new Produs[magazin.getNrTotalProduse()], magazin.getNrTotalProduse());
 		for (int i = 0; i < magazin.getNrTotalProduse(); i++) {
@@ -679,9 +775,10 @@ public:
 		return out;
 	}
 };
+*/
 
 void main() {
-
+	/*
 	Angajat angajat;
 	angajat.afisareAngajat();
 
@@ -817,6 +914,38 @@ void main() {
 	cout << "Magazin atribuit:\n" << magazin3 << endl;
 	Magazin magazinNou(magazin2);
 	cout << "Magazin copie:\n" << magazinNou << endl;
+	*/
+	ofstream f("Produs.txt", ios::out);
+	ifstream fin("Produs.txt", ios::in);
+	ofstream g("Departament.txt", ios::out);
+	ifstream gin("Departament.txt", ios::in);
+	Produs testFisP;
+	Departament testFisD;
+	Produs produs1;
+	cin >> produs1;
+	produs1.sciereInFisierBinar("test.dat");
+	cout << produs1 << endl;
+	Produs produsTest;
+	cout << produsTest;
+	produsTest.citesteDinFisierBinar("test.dat");
+	cout << produsTest << endl << endl;
+	f << produs1;
+	fin >> testFisP;
+	cout << endl << testFisP;
+	cout << endl;
 
+	Departament d1;
+	cin >> d1;
+	d1.scriereInFisierBinar("test2.dat");
+	Departament d2;
+	cout << endl << d2 << endl;
+	d2.citireInFisierBinar("test2.dat");
+	cout << d2;
+	g << d1;
+	gin >> testFisD;
+	cout << endl << testFisD << endl;
+	f.close();
+	g.close();
+	fin.close();
+	gin.close();
 };
-
