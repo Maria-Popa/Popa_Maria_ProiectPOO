@@ -1,10 +1,19 @@
-//Domeniul: COMPANIE
+ //Domeniul: COMPANIE
 
 #include<iostream>
 #include<fstream>
-using namespace std;
+	using namespace std;
 
-class Angajat {
+class VanzareCuAmanuntul {
+public:
+	virtual bool areDepozit() = 0;
+};
+
+class Persoana {
+	virtual bool esteInIT() = 0;
+};
+
+class Angajat : public Persoana {
 private:
 	string nume;
 	int* varsta;
@@ -65,6 +74,13 @@ public:
 		for (int j = this->nrTotalAngajati; j < aux.nrTotalAngajati; j++)
 			aux.varsta[j] = a.varsta[j - this->nrTotalAngajati];
 		return aux;
+	}
+
+	bool esteInIT() {
+		if (this->departament == "IT")
+			return true;
+		else
+			return false;
 	}
 
 	int& operator[](int index) {
@@ -194,9 +210,8 @@ public:
 	}
 
 };
+
 int Angajat::nrTotalAngajati = 230;
-
-
 
 class Departament {
 private:
@@ -407,8 +422,7 @@ public:
 
 string Departament::manager = "Manager";
 
-
-class Produs {
+class Produs : public VanzareCuAmanuntul {
 private:
 	string nume;
 	float pret;
@@ -466,6 +480,7 @@ public:
 			for (int i = 0; i < this->nrMarciIstoric; i++)
 				this->istoricMarci[i] = p.istoricMarci[i];
 		}
+		return *this;
 	}
 
 	const bool& operator<(const Produs& p) {
@@ -482,6 +497,10 @@ public:
 
 	int& operator[](int index) {
 		return this->istoricMarci[index];
+	}
+
+	bool areDepozit() {
+		return false;
 	}
 
 	~Produs() {
@@ -646,8 +665,8 @@ public:
 };
 
 int Produs::nrTotalProduse = 2000;
-/*
-class Magazin {
+
+class Magazin : public VanzareCuAmanuntul {
 private:
 	string nume;
 	int nrTotalProduse;
@@ -687,18 +706,20 @@ public:
 		return nrTotalProduse;
 	}
 
-	void nrAngajati(int nrAngajati) {
-		nrAngajati = nrAngajati;
+	void setNrAngajati(int nrAngajati) {
+		this->nrAngajati = nrAngajati;
 	}
 
-	int nrAngajati() const {
-		return nrAngajati;
+	int getNrAngajati() const {
+		return this->nrAngajati;
 	}
 
 	void setProduse(Produs* produs, int nrProduse) {
-		produse = new Produs[nrProduse];
+		if (this->produse != NULL)
+			delete[]this->produse;
+		this->produse = new Produs[nrProduse];
 		for (int i = 0; i < nrProduse; i++) {
-			produse[i] = produs[i];
+			this->produse[i] = produs[i];
 		}
 	}
 
@@ -736,6 +757,10 @@ public:
 			delete[]this->produse;
 	}
 
+	bool areDepozit() {
+		return (this->nrTotalProduse > 50);
+	}
+
 	friend istream& operator>>(istream& in, Magazin& magazin) {
 		cout << "Nume:";
 		in >> magazin.nume;
@@ -747,18 +772,11 @@ public:
 		{
 			delete[]magazin.produse;
 		}
-		//magazin.produse = new Produs[magazin.nrTotalProduse];
-		//for (Produs* i = 0; i < magazin.nrTotalProduse; i++)
-		//{
-		//	cout << " Produsele " << i + 1 << " : ";
-		//	in >> magazin.nrTotalProduse[i];
+		magazin.produse = new Produs[magazin.nrTotalProduse];
 
-		//}
-
-		magazin.setProduse(new Produs[magazin.getNrTotalProduse()], magazin.getNrTotalProduse());
 		for (int i = 0; i < magazin.getNrTotalProduse(); i++) {
 			cout << "Produsul " << i + 1 << " : ";
-			in >> magazin.getProduse()[i];
+			in >> magazin.produse[i];
 		}
 
 		return in;
@@ -775,7 +793,106 @@ public:
 		return out;
 	}
 };
-*/
+
+class BestSeller : public Produs {
+private:
+	bool esteBestSeller;
+	int nrVanzari;
+public:
+	BestSeller() : Produs() {
+		this->esteBestSeller = false;
+		this->nrVanzari = 0;
+	}
+	BestSeller(int nrVanzari, bool esteBestSeller, string nume, float pret, int stocDisponibil, float taxaTVA, int nrMarciDinIstoric, int* istoricMarci) : Produs(nume, pret, stocDisponibil, taxaTVA, nrMarciDinIstoric, istoricMarci) {
+		this->nrVanzari = nrVanzari;
+		this->esteBestSeller = esteBestSeller;
+	}
+	~BestSeller() {
+
+	}
+	BestSeller(BestSeller& b) : Produs(b) {
+		this->esteBestSeller = b.esteBestSeller;
+		this->nrVanzari = b.nrVanzari;
+	}
+	const  BestSeller operator=(const BestSeller b) {
+		this->esteBestSeller = b.esteBestSeller;
+		this->nrVanzari = b.nrVanzari;
+		(Produs&)*this = (Produs&)b;
+		return *this;
+	}
+	void setEsteBestSeller(bool este) {
+		this->esteBestSeller = este;
+	}
+	void setNrVanzari(int nrVanzari) {
+		this->nrVanzari = nrVanzari;
+	}
+	bool getEsteBestSeller() const {
+		return this->esteBestSeller;
+	}
+	int getNrVanzari() const {
+		return this->nrVanzari;
+	}
+	friend istream& operator>>(istream& in, Produs& p);
+	friend istream& operator>>(istream& in, BestSeller& b) {
+		cout << "Este best seller?\n";
+		in >> b.esteBestSeller;
+		cout << "Cate produse s-au vandut?\n";
+		in >> b.nrVanzari;
+		in >> (Produs&)b;
+		return in;
+	}
+	friend ostream& operator<<(ostream& out, Produs& p);
+	friend ostream& operator<<(ostream& out, BestSeller& p) {
+		out << (Produs&)p;
+		if (p.esteBestSeller)
+			out << "Acest produs este un best seller si s-au vandut " << p.nrVanzari << " produse.";
+		else
+			out << "Acest produs nu este un best seller.";
+		return out;
+	}
+};
+
+class Manager : public Angajat {
+private:
+	int aniInFunctie;
+public:
+	Manager() : Angajat() {
+		this->aniInFunctie = 0;
+	}
+	Manager(int aniInFct, string nume, int* varsta, float salariu, string departament, int nrTotalAngajati, string companie) : Angajat(nume, varsta, salariu, departament, nrTotalAngajati, companie) {
+		this->aniInFunctie = aniInFct;
+	}
+	~Manager() {
+
+	}
+	Manager(Manager& m) : Angajat(m) {
+		this->aniInFunctie = m.aniInFunctie;
+	}
+	const Manager operator=(const Manager& m) {
+		this->aniInFunctie = m.aniInFunctie;
+		(Angajat&)*this = (Angajat)m;
+		return *this;
+	}
+	void setAniInFunctie(int ani) {
+		this->aniInFunctie = ani;
+	}
+	int getAniInFunctie() const {
+		return this->aniInFunctie;
+	}
+	friend istream& operator>>(istream& in, Angajat& a);
+	friend istream& operator>>(istream& in, Manager& m) {
+		cout << "De cat timp este acesta in functia de manager?";
+		in >> m.aniInFunctie;
+		in >> (Angajat&)m;
+		return in;
+	}
+	friend ostream& operator<<(ostream& out, Angajat& a);
+	friend ostream& operator<<(ostream& out, Manager& m) {
+		out << "Acest angajat este manager pe departamentul sau de " << m.aniInFunctie << "ani.\n";
+		out << (Angajat&)m;
+		return out;
+	}
+};
 
 void main() {
 	/*
@@ -894,58 +1011,72 @@ void main() {
 			cout << matriceProdus[i][j];
 		}
 	}
+		*/
+		//cout << endl;
 
-	cout << endl;
+		//Magazin magazin1;
+		//cin >> magazin1;
+		//cout << magazin1;
 
-	Magazin magazin1;
-	cin >> magazin1;
-	cout << magazin1;
+		//Magazin magazin2;
+		//cout << "Introduceti informatii despre magazin:\n";
+		//cin >> magazin2;
+		//cout << "Magazin:\n" << magazin2 << endl;
+		//cout << "Numele magazinului: " << magazin2.getNume() << endl;
+		//cout << "Numar total produse magazin: " << magazin2.getNrTotalProduse() << endl;
+		//magazin2.setNume("Magazin nou");
+		//cout << "Magazin dupa actualizare:\n" << magazin2 << endl;
+		//Magazin magazin3;
+		//magazin3 = magazin2;
+		//cout << "Magazin atribuit:\n" << magazin3 << endl;
+		//Magazin magazinNou(magazin2);
+		//cout << "Magazin copie:\n" << magazinNou << endl;
 
-	Magazin magazin2;
-	cout << "Introduceti informatii despre magazin:\n";
-	cin >> magazin2;
-	cout << "Magazin:\n" << magazin2 << endl;
-	cout << "Numele magazinului: " << magazin2.getNume() << endl;
-	cout << "Numar total produse magazin: " << magazin2.getNrTotalProduse() << endl;
-	magazin2.setNume("Magazin nou");
-	cout << "Magazin dupa actualizare:\n" << magazin2 << endl;
-	Magazin magazin3;
-	magazin3 = magazin2;
-	cout << "Magazin atribuit:\n" << magazin3 << endl;
-	Magazin magazinNou(magazin2);
-	cout << "Magazin copie:\n" << magazinNou << endl;
-	*/
-	ofstream f("Produs.txt", ios::out);
-	ifstream fin("Produs.txt", ios::in);
-	ofstream g("Departament.txt", ios::out);
-	ifstream gin("Departament.txt", ios::in);
-	Produs testFisP;
-	Departament testFisD;
-	Produs produs1;
-	cin >> produs1;
-	produs1.sciereInFisierBinar("test.dat");
-	cout << produs1 << endl;
-	Produs produsTest;
-	cout << produsTest;
-	produsTest.citesteDinFisierBinar("test.dat");
-	cout << produsTest << endl << endl;
-	f << produs1;
-	fin >> testFisP;
-	cout << endl << testFisP;
-	cout << endl;
+		/*ofstream f("Produs.txt", ios::out);
+		ifstream fin("Produs.txt", ios::in);
+		ofstream g("Departament.txt", ios::out);
+		ifstream gin("Departament.txt", ios::in);
+		Produs testFisP;
+		Departament testFisD;
+		Produs produs1;
+		cin >> produs1;
+		produs1.sciereInFisierBinar("test.dat");
+		cout << produs1 << endl;
+		Produs produsTest;
+		cout << produsTest;
+		produsTest.citesteDinFisierBinar("test.dat");
+		cout << produsTest << endl << endl;
+		f << produs1;
+		fin >> testFisP;
+		cout << endl << testFisP;
+		cout << endl;
 
-	Departament d1;
-	cin >> d1;
-	d1.scriereInFisierBinar("test2.dat");
-	Departament d2;
-	cout << endl << d2 << endl;
-	d2.citireInFisierBinar("test2.dat");
-	cout << d2;
-	g << d1;
-	gin >> testFisD;
-	cout << endl << testFisD << endl;
-	f.close();
-	g.close();
-	fin.close();
-	gin.close();
+		Departament d1;
+		cin >> d1;
+		d1.scriereInFisierBinar("test2.dat");
+		Departament d2;
+		cout << endl << d2 << endl;
+		d2.citireInFisierBinar("test2.dat");
+		cout << d2;
+		g << d1;
+		gin >> testFisD;
+		cout << endl << testFisD << endl;
+		f.close();
+		g.close();
+		fin.close();
+		gin.close();*/
+		//
+		//BestSeller bs;
+		//cin >> bs;
+		//cout << bs;
+		//Manager m;
+		//cin >> m;
+		//cout << m;
+	VanzareCuAmanuntul** va = new VanzareCuAmanuntul * [10];
+	for (int i = 0; i < 5; i++)
+		va[i] = new Magazin();
+	for (int i = 5; i < 10; i++)
+		va[i] = new Produs();
+	for (int i = 0; i < 10; i++)
+		cout << va[i]->areDepozit() << " ";
 };
